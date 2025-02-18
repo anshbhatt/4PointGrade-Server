@@ -3,7 +3,7 @@
 This repository provides RESTful API used in the 4PointGrade project. The API includes endpoints to retrieve a list of supported colleges and fetch the grading scale used by a specific college.
 
 ## Vision  
-Many Indian students face difficulties converting their GPA to the widely used 4.0 scale, especially when applying to international universities. <a href="https://4pointgrade.in/">4PointGrade</a> aims to provide a simple, free, and accurate tool to help students across India convert their GPA based on official grading scales from different colleges.  
+Many Indian students face difficulties converting their GPA to the widely used 4.0 scale, especially when applying to international universities. <a href="https://4pointgrade.in/" target="_blank">4PointGrade</a> aims to provide a simple, free, and accurate tool to help students across India convert their GPA based on official grading scales from different colleges.  
 
 ## Features  
 - Retrieve a list of available colleges.  
