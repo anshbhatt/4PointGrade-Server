@@ -12,7 +12,6 @@ const restColumnMap = {
 };
 
 const shapeResponse = function (rows, offset) {
-    if (rows.length == 0) return rows;
     const items = rows.map(row => {
         const shapedRow = {};
         Object.keys(row).forEach(key => {
