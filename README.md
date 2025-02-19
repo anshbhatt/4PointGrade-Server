@@ -22,15 +22,19 @@ Returns a list of supported colleges.
 **Response Example:**  
 ```json
 {
-  "response": [
-    {
-        "CollegeId": "C-101",
-        "CollegeName": "Indian Institute of Technology, Guwahati",
-        "CollegeCode": "IITG",
-        "City": "Guwahati",
-        "State": "Assam"
-    }
-  ]
+    "items": [
+        {
+            "CollegeId": "C-101",
+            "CollegeName": "Indian Institute of Technology, Guwahati",
+            "CollegeCode": "IITG",
+            "City": "Guwahati",
+            "State": "Assam"
+        }
+    ],
+    "count": 1,
+    "limit": 25,
+    "offset": 0,
+    "hasMore": false
 }
 ```
 
@@ -48,24 +52,28 @@ Returns the grade scale used by the specified college.
 **Response Example:**  
 ```json
 {
-  "response": [
-    {
-        "GradeId": "G-101",
-        "CollegeId": "C-101",
-        "GradePoint": "AS",
-        "GradeValue": 10,
-        "Description": "Outstanding",
-        "USGrade": 4
-    },
-    {
-        "GradeId": "G-102",
-        "CollegeId": "C-101",
-        "GradePoint": "AA",
-        "GradeValue": 10,
-        "Description": "Excellant",
-        "USGrade": 4
-    }
-  ]
+    "items": [
+        {
+            "GradeId": "G-101",
+            "CollegeId": "C-101",
+            "GradePoint": "AS",
+            "GradeValue": 10,
+            "Description": "Outstanding",
+            "USGrade": 4
+        },
+        {
+            "GradeId": "G-102",
+            "CollegeId": "C-101",
+            "GradePoint": "AA",
+            "GradeValue": 10,
+            "Description": "Excellant",
+            "USGrade": 4
+        }
+    ],
+    "count": 2,
+    "limit": 25,
+    "offset": 0,
+    "hasMore": false
 }
 ```
 
