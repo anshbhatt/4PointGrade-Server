@@ -145,5 +145,6 @@ dist
 .Wallet_Database4PG
 .cred
 .vscode
+.DS_Store
 
 # End of https://www.toptal.com/developers/gitignore/api/node

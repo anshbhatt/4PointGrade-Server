@@ -53,8 +53,8 @@ const resources = [
                 res.json({'Error': e.message});
                 return;
             }
-            response = shapeResponse(response);
-            res.json({ response });
+            response = shapeResponse(response, offset);
+            res.json(response);
         }
     },
     {
@@ -88,8 +88,8 @@ const resources = [
                 res.json({'Error': e.message});
                 return;
             }
-            response = shapeResponse(response);
-            res.json({ response });
+            response = shapeResponse(response, offset);
+            res.json(response);
         }
     }
 ];

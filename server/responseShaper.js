@@ -11,15 +11,25 @@ const restColumnMap = {
     US_GRADE_POINT: "USGrade"
 };
 
-const shapeResponse = function (rows) {
+const shapeResponse = function (rows, offset) {
     if (rows.length == 0) return rows;
-    return rows.map(row => {
+    const items = rows.map(row => {
         const shapedRow = {};
         Object.keys(row).forEach(key => {
             shapedRow[restColumnMap[key]] = row[key];
         });
         return shapedRow;
     });
+    const count = rows.length;
+    const limit = 25;
+    const hasMore = rows.length == 25;
+    return {
+        items,
+        count,
+        limit,
+        offset: offset || 0,
+        hasMore
+    };
 }
 
 module.exports = { shapeResponse };
