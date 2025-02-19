@@ -86,7 +86,7 @@ Returns the grade scale used by the specified college.
 ### Installation  
 1. Clone the repository:  
    ```sh
-   git clone https://github.com/yourusername/gpa-converter-api.git
+   git clone https://github.com/anshbhatt/4PointGrade-Server.git
    cd 4PointGrade-Server
    ```
 2. Install dependencies:  
