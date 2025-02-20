@@ -49,7 +49,7 @@ const resources = [
             }
             res.status(201);
             response = shapeResponse(response);
-            res.json(response);
+            res.json(response.items[0]);
         }
     },
     {

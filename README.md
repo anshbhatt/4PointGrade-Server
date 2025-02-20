@@ -6,8 +6,10 @@ This repository provides RESTful API used in the 4PointGrade project. The API in
 Many Indian students face difficulties converting their GPA to the widely used 4.0 scale, especially when applying to international universities. <a href="https://4pointgrade.in/" target="_blank">4PointGrade</a> aims to provide a simple, free, and accurate tool to help students across India convert their GPA based on official grading scales from different colleges.  
 
 ## Features  
-- Retrieve a list of available colleges.  
-- Fetch the corresponding grade scale used by a selected college.
+- Retrieve a list of available colleges.
+- Fetch the grade scale used by a selected college.
+- Add a new college
+- Remove a college and its grade scale
 
 ## API Endpoints  
 
@@ -76,6 +78,46 @@ Returns the grade scale used by the specified college.
     "hasMore": false
 }
 ```
+
+### 3. Add a New College
+**Endpoint:**  
+```
+POST /colleges
+```
+**Description:**  
+Posts the details of a college.
+
+**Payload Example**
+```json
+{
+    "CollegeName": "Test College Name",    // Non Null
+    "CollegeCode": null,                   // Nullable
+    "City": "Hyderabad",                   // Non Null
+    "State": "Telangana"                   // Non Null
+}
+```
+
+**Response Example:**  
+```json
+{
+    "CollegeId": "C-102",
+    "CollegeName": "Test College Name",
+    "CollegeCode": null,
+    "City": "Hyderabad",
+    "State": "Telangana"
+}
+```
+
+### 4. Remove Existing College
+**Endpoint:**  
+```
+DELETE /colleges/{collegeId}
+```
+**Parameters:**  
+- `collegeId` – The ID of the college.  
+
+**Description:**  
+Deletes specified college, its details and its grade scale.
 
 ## Setup  
 ### Requirements  
