@@ -1,4 +1,4 @@
-const restColumnMap = {
+const _restColumnMap = {
     CITY: "City",
     COLLEGE_CODE: "CollegeCode",
     COLLEGE_ID: "CollegeId",
@@ -15,7 +15,7 @@ const shapeResponse = function (rows, offset) {
     const items = rows.map(row => {
         const shapedRow = {};
         Object.keys(row).forEach(key => {
-            shapedRow[restColumnMap[key]] = row[key];
+            shapedRow[_restColumnMap[key]] = row[key];
         });
         return shapedRow;
     });

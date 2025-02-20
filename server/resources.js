@@ -1,30 +1,6 @@
-const { TABLE_SEARCH_COLUMNS, DB_COLUMNS, executeQuery } = require("./db");
+const { isAuthorized } = require("./.cred");
+const { executeQuery, getSelectClause, getWhereClause, getOffsetClause, executePost, deleteRecord } = require("./db");
 const { shapeResponse } = require("./responseShaper");
-
-const getSelectClause = function (fields, table) {
-    if (fields != null) {
-        const fieldArray = fields.split(',');
-        const selectedFields = fieldArray.map(field => {
-            const columnName = DB_COLUMNS[table][field];
-            if (!columnName) throw new Error(`Unexpected field name: ${field}`);
-            return columnName;
-        }).join(', ');
-        return `SELECT ${selectedFields}`;
-    }
-    return 'SELECT *';
-}
-
-const getWhereClause = function (searchTerm, table) {
-    if (searchTerm == null || searchTerm == '') return '';
-    if (TABLE_SEARCH_COLUMNS[table] == null || TABLE_SEARCH_COLUMNS[table].length === 0) return '';
-    return `WHERE ${TABLE_SEARCH_COLUMNS[table].map(column => `LOWER(${column}) LIKE '%${searchTerm.toLowerCase()}%'`).join(' OR ')} `;
-}
-
-const getOffsetClause = function (offset) {
-    if (offset == null || offset == '') return '';
-    if (/\D/.test(offset)) throw new Error(`Integer value expected. Found: ${offset}`);
-    return ` OFFSET ${offset} ROWS`
-}
 
 const resources = [
     {
@@ -54,6 +30,25 @@ const resources = [
                 return;
             }
             response = shapeResponse(response, offset);
+            res.json(response);
+        },
+        post: async (req, res) => {
+            const httpAuth = req.headers.authorization;
+            if (!isAuthorized(httpAuth)) {
+                res.status(403);
+                res.json({Error: 'Unauthorized Acces.'});
+                return
+            };
+            let response;
+            try {
+                response = await executePost(req.body, 'COLLEGES');
+            } catch(e) {
+                res.status(400);
+                res.json({'Error': e.message});
+                return;
+            }
+            res.status(201);
+            response = shapeResponse(response);
             res.json(response);
         }
     },
@@ -90,6 +85,34 @@ const resources = [
             }
             response = shapeResponse(response, offset);
             res.json(response);
+        }
+    },
+    {
+        path: "/colleges/:collegeId",
+        delete: async (req, res) => {
+            const httpAuth = req.headers.authorization;
+            if (!isAuthorized(httpAuth)) {
+                res.status(403);
+                res.json({Error: 'Unauthorized Acces.'});
+                return
+            };
+            const { params } = req;
+            const { collegeId } = params;
+            if (collegeId == null || collegeId == '' || !/C-[0-9]+/.test(collegeId)) {
+                res.status(400);
+                res.json({ Error: 'Invalid College Id.' });
+                return;
+            }
+            let response;
+            try {
+                response = await deleteRecord(collegeId, 'COLLEGES');
+            } catch(e) {
+                res.status(400);
+                res.json({'Error': e.message});
+                return;
+            }
+            res.status(response ? 204 : 404);
+            res.json();
         }
     }
 ];
