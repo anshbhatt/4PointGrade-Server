@@ -1,5 +1,5 @@
 const oracledb = require("oracledb");
-const { USER, PASS } = require("./.cred");
+const { USER, PASS } = require("./.env");
 
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
 

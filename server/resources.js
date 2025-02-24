@@ -1,6 +1,11 @@
-const { isAuthorized } = require("./.cred");
+const { USER, PASS } = require("./.env");
 const { executeQuery, getSelectClause, getWhereClause, getOffsetClause, executePost, deleteRecord } = require("./db");
 const { shapeResponse } = require("./responseShaper");
+
+const isAuthorized = function (httpAuth) {
+    const auth = `Basic ${new Buffer.from(`${USER}:${PASS}`).toString('base64')}`;
+    return (auth === httpAuth);
+}
 
 const resources = [
     {

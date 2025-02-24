@@ -143,7 +143,6 @@ dist
 
 # Custom 
 .Wallet_Database4PG
-.cred
 .vscode
 .DS_Store
 
