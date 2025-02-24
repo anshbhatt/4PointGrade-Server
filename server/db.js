@@ -47,6 +47,68 @@ const _TABLE_SEARCH_COLUMNS = {
     GRADE_SCALES: []
 };
 
+const _insertRowToColleges = async function (payload) {
+    const { CollegeName, CollegeCode, City, State } = payload;
+    const table = 'COLLEGES';
+
+    const insertColumns = ['CollegeName', 'CollegeCode', 'City', 'State'].filter(col => payload[col] != null).map(col => _DB_COLUMNS[table][col]);
+    const insertValues = [CollegeName, CollegeCode, City, State].filter(col => col != null).map(col => `'${_sanitizeInput(col)}'`).join(', ');
+    const sqlQuery_post = `INSERT INTO ${table} (COLLEGE_ID, ${insertColumns}) VALUES (CONCAT('C-', COLLEGE_ID_SEQUENCE.nextval), ${insertValues}) RETURN COLLEGE_ID INTO :collegeId`;
+    let connection;
+    let response;
+    try {
+        connection = await _getConnection();
+        response = await connection.execute(sqlQuery_post, { collegeId: { type: oracledb.STRING, dir: oracledb.BIND_OUT } }, { autoCommit: true });
+        const collegeId = response.outBinds.collegeId[0];
+        const sqlQuery_get = `SELECT * FROM ${table} WHERE COLLEGE_ID = '${collegeId}'`;
+        response = await executeQuery(sqlQuery_get);
+    } catch (e) {
+        if (connection != null) connection.close();
+        throw e;
+    }
+    if (connection != null) connection.close();
+    return response;
+}
+
+const _insertRowsToGradeScales = async function (payload, collegeId) {
+    let payloadArray = [];
+    if (!Array.isArray(payload)) payloadArray.push(payload);
+    else payloadArray = [ ...payload ];
+
+    let connection;
+    try {
+        connection = await _getConnection();
+    } catch(e) {
+        if (connection != null) connection.close();
+        throw e;
+    }
+
+    const table = 'GRADE_SCALES';
+
+    for (item of payloadArray) {
+        const { GradeValue, GradePoint, Description, USGrade } = item;
+        const insertColumns = ['GradeValue', 'GradePoint', 'Description', 'USGrade'].filter(col => item[col] != null).map(col => _DB_COLUMNS[table][col]);
+        const insertValues = [GradeValue, GradePoint, Description, USGrade].filter(col => col != null).map(col => typeof col === 'string' ? `'${_sanitizeInput(col)}'` : col).join(', ');
+        const sqlQuery_post = `INSERT INTO ${table} (GRADE_ID, COLLEGE_ID, ${insertColumns}) VALUES (CONCAT('G-', GRADE_ID_SEQUENCE.nextval), '${collegeId}', ${insertValues})`;
+        try {
+            await connection.execute(sqlQuery_post, {}, { autoCommit: true });
+        } catch (e) {
+            if (connection != null) connection.close();
+            throw e;
+        }
+    }
+    let response;
+    const sqlQuery_get = `SELECT * FROM ${table} WHERE COLLEGE_ID = '${collegeId}' ORDER BY GRADE_ID DESC`;
+    try {
+        response = await executeQuery(sqlQuery_get, payloadArray.length);
+    } catch (e) {
+        if (connection != null) connection.close();
+        throw e;
+    }
+    if (connection != null) connection.close();
+    return response;
+}
+
 const getSelectClause = function (fields, table) {
     if (fields != null) {
         const fieldArray = fields.split(',');
@@ -72,12 +134,12 @@ const getOffsetClause = function (offset) {
     return ` OFFSET ${offset} ROWS`
 }
 
-const executeQuery = async function (sqlQuery) {
+const executeQuery = async function (sqlQuery, limit = 25) {
     let response;
     let connection;
     try {
         connection = await _getConnection();
-        response = await connection.execute(sqlQuery, [], { maxRows: 25 });
+        response = await connection.execute(sqlQuery, [], { maxRows: limit });
     }
     catch (e) {
         if (connection != null) connection.close();
@@ -87,25 +149,16 @@ const executeQuery = async function (sqlQuery) {
     return response.rows;
 }
 
-const executePost = async function (payload, table) {
-    const { CollegeName, CollegeCode, City, State } = payload;
-    const insertColumns = ['CollegeName', 'CollegeCode', 'City', 'State'].filter(col => payload[col] != null).map(col => _DB_COLUMNS[table][col]);
-    const insertValues = [CollegeName, CollegeCode, City, State].filter(col => col != null).map(col => `'${_sanitizeInput(col)}'`).join(', ');
-    const sqlQuery_post = `INSERT INTO ${table} (COLLEGE_ID, ${insertColumns}) VALUES (CONCAT('C-', COLLEGE_ID_SEQUENCE.nextval), ${insertValues}) RETURN COLLEGE_ID INTO :collegeId`;
-    let connection;
-    let response;
+const executePost = async function (payload, options) {
+    const { table, collegeId } = options;
     try {
-        connection = await _getConnection();
-        response = await connection.execute(sqlQuery_post, { collegeId: { type: oracledb.STRING, dir: oracledb.BIND_OUT } }, { autoCommit: true });
-        const collegeId = response.outBinds.collegeId[0];
-        const sqlQuery_get = `SELECT * FROM COLLEGES WHERE COLLEGE_ID = '${collegeId}'`;
-        response = await executeQuery(sqlQuery_get);
+        if (table === 'COLLEGES') {
+            return await _insertRowToColleges(payload);
+        }
+        return await _insertRowsToGradeScales(payload, collegeId);
     } catch (e) {
-        if (connection != null) connection.close();
         throw e;
     }
-    if (connection != null) connection.close();
-    return response;
 }
 
 const deleteRecord = async function (id, table) {

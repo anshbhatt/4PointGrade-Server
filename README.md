@@ -7,9 +7,11 @@ Many Indian students face difficulties converting their GPA to the widely used 4
 
 ## Features  
 - Retrieve a list of available colleges.
+- Fetch the details of a specific college.
+- Add a new college.
 - Fetch the grade scale used by a selected college.
-- Add a new college
-- Remove a college and its grade scale
+- Add grades for a college.
+- Remove a college and its grade scale.
 
 ## API Endpoints  
 
@@ -40,7 +42,55 @@ Returns a list of supported colleges.
 }
 ```
 
-### 2. Get Grade Scale for a College  
+### 2. Get Specific College
+**Endpoint:**  
+```
+GET /colleges/{collegeId}
+```
+**Description:**  
+Returns details of specified college.  
+
+**Response Example:**  
+```json
+{
+    "CollegeId": "C-101",
+    "CollegeName": "Indian Institute of Technology, Guwahati",
+    "CollegeCode": "IITG",
+    "City": "Guwahati",
+    "State": "Assam"
+}
+```
+
+### 3. Add New College
+**Endpoint:**  
+```
+POST /colleges
+```
+**Description:**  
+Requires authorization. Posts the details of a college.
+
+**Payload Example**
+```json
+{
+    "CollegeName": "Test College Name",    // Non Null
+    "CollegeCode": null,                   // Nullable
+    "City": "Hyderabad",                   // Non Null
+    "State": "Telangana"                   // Non Null
+}
+```
+
+**Response Example:**  
+```json
+{
+    "CollegeId": "C-102",
+    "CollegeName": "Test College Name",
+    "CollegeCode": null,
+    "City": "Hyderabad",
+    "State": "Telangana"
+}
+```
+
+### 4. Get Grade Scale for a College  
 **Endpoint:**  
 ```
 GET /gradeScales/{collegeId}
@@ -79,36 +129,58 @@ Returns the grade scale used by the specified college.
 }
 ```
 
-### 3. Add a New College
+### 5. Add Grades for College
 **Endpoint:**  
 ```
-POST /colleges
+POST /gradeScales/{collegeId}
 ```
+**Parameters:**  
+- `collegeId` – The ID of the college. 
+
 **Description:**  
-Posts the details of a college.
+Requires authorization. Posts the grades for a college.
 
 **Payload Example**
 ```json
-{
-    "CollegeName": "Test College Name",    // Non Null
-    "CollegeCode": null,                   // Nullable
-    "City": "Hyderabad",                   // Non Null
-    "State": "Telangana"                   // Non Null
-}
+[
+    {
+        "GradePoint": "AB",                //Non Null
+        "GradeValue": 9,                   //Non Null
+        "Description": null,               //Nullable
+        "USGrade": 4                       //Non Null
+    },
+    {
+        "GradePoint": "BB",
+        "GradeValue": 8,
+        "Description": "Okay",
+        "USGrade": 3.5
+    }
+]
 ```
 
 **Response Example:**  
 ```json
-{
-    "CollegeId": "C-102",
-    "CollegeName": "Test College Name",
-    "CollegeCode": null,
-    "City": "Hyderabad",
-    "State": "Telangana"
-}
+[
+    {
+        "GradeId": "G-103",
+        "CollegeId": "C-101",
+        "GradePoint": "AB",
+        "GradeValue": 9,
+        "Description": null,
+        "USGrade": 4
+    },
+    {
+        "GradeId": "G-104",
+        "CollegeId": "C-101",
+        "GradePoint": "BB",
+        "GradeValue": 8,
+        "Description": "Okay",
+        "USGrade": 3.5
+    }
+]
 ```
 
-### 4. Remove Existing College
+### 6. Remove Existing College
 **Endpoint:**  
 ```
 DELETE /colleges/{collegeId}
@@ -117,7 +189,7 @@ DELETE /colleges/{collegeId}
 - `collegeId` – The ID of the college.  
 
 **Description:**  
-Deletes specified college, its details and its grade scale.
+Requires authorization. Deletes specified college, its details and its grade scale. Returns status 204 if successful.
 
 ## Setup  
 ### Requirements  

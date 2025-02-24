@@ -26,7 +26,7 @@ const shapeResponse = function (rows, offset) {
         items,
         count,
         limit,
-        offset: offset || 0,
+        offset: Number(offset) || 0,
         hasMore
     };
 }

@@ -41,7 +41,7 @@ const resources = [
             };
             let response;
             try {
-                response = await executePost(req.body, 'COLLEGES');
+                response = await executePost(req.body, { table: 'COLLEGES' });
             } catch(e) {
                 res.status(400);
                 res.json({'Error': e.message});
@@ -85,6 +85,33 @@ const resources = [
             }
             response = shapeResponse(response, offset);
             res.json(response);
+        },
+        post: async (req, res) => {
+            const httpAuth = req.headers.authorization;
+            if (!isAuthorized(httpAuth)) {
+                res.status(403);
+                res.json({Error: 'Unauthorized Acces.'});
+                return
+            };
+            const { params } = req;
+            const { collegeId } = params;
+            if (collegeId == null || collegeId == '' || !/C-[0-9]+/.test(collegeId)) {
+                const e = new Error('Invalid College Id');
+                res.status(400);
+                res.json({ Error: e.message });
+                return;
+            }
+            let response;
+            try {
+                response = await executePost(req.body, { table: 'GRADE_SCALES', collegeId: collegeId });
+            } catch(e) {
+                res.status(400);
+                res.json({'Error': e.message});
+                return;
+            }
+            res.status(201);
+            response = shapeResponse(response);
+            res.json(response.items);
         }
     },
     {
@@ -113,6 +140,37 @@ const resources = [
             }
             res.status(response ? 204 : 404);
             res.json();
+        },
+        get: async (req, res) => {
+            const { params, query } = req;
+            const { collegeId } = params;
+            const { fields } = query;
+            if (collegeId == null || collegeId == '' || !/C-[0-9]+/.test(collegeId)) {
+                res.status(400);
+                res.json({ Error: 'Invalid College Id.' });
+                return;
+            }
+            let selectClause;
+            let whereClause;
+            try {
+                selectClause = getSelectClause(fields, 'COLLEGES');
+                whereClause = `WHERE COLLEGE_ID = '${collegeId}' `;
+            } catch (e) {
+                res.status(400);
+                res.json({'Error': e.message});
+                return;
+            }
+            const sqlQuery = `${selectClause} FROM COLLEGES ${whereClause}ORDER BY COLLEGE_NAME`;
+            let response;
+            try {
+                response = await executeQuery(sqlQuery);
+            } catch(e) {
+                res.status(400);
+                res.json({'Error': e.message});
+                return;
+            }
+            response = shapeResponse(response, 0);
+            res.json(response.items[0] || {});
         }
     }
 ];
