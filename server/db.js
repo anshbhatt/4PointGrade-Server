@@ -10,8 +10,7 @@ const _getConnection = async function () {
             user: USER,
             password: PASS,
             port: 1522,
-            connectString: "database4pg_high",
-            configDir: "server/.Wallet_Database4PG"
+            connectString: "(description= (retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.ap-mumbai-1.oraclecloud.com))(connect_data=(service_name=gfea26298904789_database4pg_high.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))"
         });
     } catch (e) {
         if (connection != null) connection.close();
